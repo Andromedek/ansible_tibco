@@ -1,0 +1,9 @@
+---
+# tasks file for Dependencies
+ - name: call the template
+   template: src=java.sh dest=/etc/profile.d/java.sh 
+   become: yes
+ - name: execute the script
+   become: yes
+   shell: source /etc/profile.d/java.sh
+...  

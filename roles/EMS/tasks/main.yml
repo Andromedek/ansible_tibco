@@ -1,0 +1,34 @@
+---
+# tasks file for EMS
+ - name: Add EMS Dir
+   file: path=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/EMS state=directory mode=0755
+ - name: Copying file
+   unarchive: src=/home/remote/Downloads/TIB_ems_8.2.2_linux_x86.zip dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/EMS/
+ - name: Start Installation dependencies for x64
+   become: yes
+   yum: name=glibc.i686
+ - name: Creating copy of silent file xml
+   become: yes
+   shell: cp /home/{{ ansible_ssh_user }}/Downloads/TIBCO/EMS/TIBCOUniversalInstaller-ems.silent /home/{{ ansible_ssh_user }}/Downloads/TIBCO/EMS/Installer.silent 
+ - name: Update installer file
+   replace: dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/EMS/Installer.silent regexp='user' replace={{ ansible_ssh_user }} backup=yes
+ - name: Update installer file of conf
+   replace: dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/EMS/Installer.silent regexp="/home/{{ ansible_ssh_user }}/tibco/cfgmgmt/ems/data/tibemsd.conf" replace="/home/{{ ansible_ssh_user }}/tibco/tibco/cfgmgmt/ems/data/tibemsd.conf" backup=yes
+ - name: create tibco directory
+   become: yes
+   file: path=/opt/tibco state=directory mode=0755
+ - name: access opt/tibco
+   become: yes
+   shell: chown -R {{ ansible_ssh_user }} /opt/tibco
+   run_once: true
+ - name: TIBCO HOME DIR
+   replace: dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/EMS/Installer.silent regexp='TIBCO-HOME' replace='TIBCO_HOME'
+ - name: Silent installation 
+   shell: cd /home/{{ ansible_ssh_user }}/Downloads/TIBCO/EMS/ && ./TIBCOUniversalInstaller-lnx-x86.bin -silent -V responseFile=Installer.silent
+ - name: Update tibemsd
+   replace: dest=/home/{{ ansible_ssh_user }}/tibco/tibco/cfgmgmt/ems/data/tibemsd.conf regexp='"/home/{{ ansible_ssh_user }}/tibco/tibco/cfgmgmt/ems/data/datastore/logfile"' replace=/home/{{ ansible_ssh_user }}/tibco/tibco/cfgmgmt/ems/data/datastore/logfile backup=yes
+ - name: start ems instance
+   shell: cd /opt/tibco/ems/8.2/bin/ && ./tibemsd64 -config /home/{{ ansible_ssh_user }}/tibco/tibco/cfgmgmt/ems/data/tibemsd.conf &
+ - name: Start EMS instance 
+   cron: name="tibemsd64" special_time=reboot job="/opt/tibco/ems/8.2/bin/tibemsd64"
+...

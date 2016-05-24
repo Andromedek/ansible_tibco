@@ -1,0 +1,9 @@
+---
+# tasks file for BW
+ - name: Add BW Dir
+   file: path=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/BW state=directory mode=0755
+ - name: copying file
+   unarchive: src=/home/remote/Downloads/TIB_BW_6.3.1_linux26gl23_x86_64.zip dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/BW
+ - name: Silent installation 
+   shell: cd /home/{{ ansible_ssh_user }}/Downloads/TIBCO/BW && ./TIBCOUniversalInstaller-lnx-x86-64.bin -silent -V responseFile="TIBCOUniversalInstaller_BW_6.3.1.silent"
+

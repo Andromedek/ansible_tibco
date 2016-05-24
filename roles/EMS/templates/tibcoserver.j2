@@ -1,0 +1,90 @@
+#!/bin/bash
+
+TIBCO_ROOT="/opt/tibco/ems/8.2/bin"
+TIBCO_PATH="/opt/tibco/ems/8.2/bin/tibemsd64"
+
+PATH="/sbin:/bin:/usr/sbin:/usr/bin"
+PROG="tibemsd64"
+
+if [ -f /etc/rc.d/init.d/functions ]; then
+    . /etc/rc.d/init.d/functions
+fi
+
+. /etc/init.d/functions
+
+test -x $TIBCO_PATH || exit 0
+
+tibco_pid(){
+   ps -aux | grep tibemsd64
+}
+
+tibco_start(){
+   local pid=$(tibco_pid)
+   if [ ! -z $pid ]; then
+       echo "Starting TIBCO ${TIBCO_PATH}..."
+       cd $TIBCO_ROOT
+       su - tibemsd64 -c ${TIBCO_PATH}       
+   else
+       echo "TIBCO EMS is already running with pid ${pid}..."
+   fi
+   return $? 
+}
+
+tibco_stop(){
+   local pid=$(tibco_pid)
+   if [ ! -z $pid ]; then
+       echo "Stopping TIBCO Process ${pid}..."
+       kill $pid
+   else
+       echo "Tibco is not running. Run Service tibco to start tibco."
+   fi
+   return $?
+}
+
+tibco_force_stop(){
+   local pid=$(tibco_pid)
+   if [ ! -z $pid ]; then
+       echo "Force stopping tibco process ${pid}..."
+       kill -9 $pid
+   else
+       echo "Tibco EMS is not running."
+   fi 
+}
+
+tibco_restart(){
+   tibco_stop
+   tibco_start
+}
+
+tibco_status(){
+   local pid=$(tibco_pid)
+   if [ ! -z $pid ]; then 
+       echo "Tibco is not running with process ${pid}."
+   else
+       echo "Tibco is not running."
+   fi
+}
+
+case "$1" in 
+     start)
+        tibco_start || exit 1
+        ;;
+     stop)
+        tibco_stop || exit 1
+        ;; 
+     restart)
+        tibco_restart || exit 1
+        ;;
+     status)
+        tibco_status || exit 1
+        ;;
+     force-stop)
+        tibco_stop || exit 1
+        ;;
+     *) 
+        echo "Usage: tibcoserver.sh start|stop|force-stop|restart|status" >&2
+        exit 1
+        ;;
+esac
+
+exit 0

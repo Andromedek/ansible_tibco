@@ -1,0 +1,53 @@
+---
+# tasks file for MDM
+- name: Add MDM Dir
+  file: path=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM state=directory mode=0755
+
+- name: Add MDM JBoss Dir
+  file: path=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMJBoss state=directory mode=0755
+- name: copying file
+  unarchive: src=/home/remote/Downloads/TIB_mdm-JBOSS_9.0.0_linux_x86_64.zip dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMJBoss/
+
+- name: Add MDM JBoss PGRS Dir
+  file: path=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMJBossPGRS state=directory mode=0755
+- name: copying file
+  unarchive: src=/home/remote/Downloads/TIB_mdm-JBOSS-PGRS_9.0.0_linux_x86_64.zip dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMJBossPGRS/
+
+- name: Add MDM WLG Dir
+  file: path=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMWLG state=directory mode=0755
+- name: copying file
+  unarchive: src=/home/remote/Downloads/TIB_mdm-WLG_9.0.0_linux_x86_64.zip dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMWLG/
+
+- name: Add MDM WAS Dir
+  file: path=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMWAS state=directory mode=0755
+- name: copying file
+  unarchive: src=/home/remote/Downloads/TIB_mdm-WAS_9.0.0_linux_x86_64.zip dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMWAS/ 
+
+- name: update silent file
+  become: yes
+  replace: dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMJBoss/TIBCOUniversalInstaller_cim-jboss_9.0.0.silent regexp=/opt/TIBCO/ replace=/opt/tibco/ backup=yes
+
+- name: Silent Installation MDM Jboss
+  shell: cd /home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMJBoss && ./TIBCOUniversalInstaller-lnx-x86-64.bin -silent
+
+- name: update silent file
+  become: yes
+  replace: dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMJBossPGRS/TIBCOUniversalInstaller_cim_9.0.0.silent regexp='/opt/TIBCO/' replace='/opt/tibco/' backup=yes
+
+- name: Silent Installation MDM JBossPGRS
+  shell: cd /home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMJBossPGRS && ./TIBCOUniversalInstaller-lnx-x86-64.bin -silent
+
+- name: update silent file
+  become: yes
+  replace: dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMWAS/TIBCOUniversalInstaller_cim-wasora_9.0.0.silent regexp='/opt/TIBCO/' replace='/opt/tibco/' backup=yes
+
+- name: Silent Installation MDM WAS
+  shell: cd /home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMWAS && ./TIBCOUniversalInstaller-lnx-x86-64.bin -silent	  
+
+- name: update silent file
+  become: yes
+  replace: dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMWLG/TIBCOUniversalInstaller_cim-wlgora_9.0.0.silent regexp='/opt/TIBCO/' replace='/opt/tibco/' backup=yes
+
+- name: Silent Installation MDM WLG
+  shell: cd /home/{{ ansible_ssh_user }}/Downloads/TIBCO/MDM/MDMWLG && ./TIBCOUniversalInstaller-lnx-x86-64.bin -silent 
+...

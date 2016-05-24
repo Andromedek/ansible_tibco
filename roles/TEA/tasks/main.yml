@@ -1,0 +1,27 @@
+---
+# tasks file for TEA
+ - name: Add Tea Dir
+   file: path=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/TEA state=directory mode=0755
+ - name: copying file
+   unarchive: src=/home/remote/Downloads/TIB_tea_2.2.0_linux26gl23_x86_64.zip dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/TEA
+ - name: copy file 
+   shell: cp /home/{{ ansible_ssh_user }}/Downloads/TIBCO/TEA/TIBCOUniversalInstaller_tea_2.2.0.silent /home/{{ ansible_ssh_user }}/Downloads/TIBCO/TEA/Installer.silent
+ - name: Update file installer
+   replace: dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/TEA/Installer.silent regexp='user' replace={{ ansible_ssh_user }} backup=yes
+ - name: update silent file
+   replace: dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/TEA/Installer.silent regexp='/opt/TIBCO/tea' replace='/opt/tibco/' backup=yes
+ - name: Update config Directory 
+   replace: dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/TEA/Installer.silent regexp='/home/user/tibco' replace='/home/{{ ansible_ssh_user }}/tibco/tibco/TEA' backup=yes
+ - name: update TIBCO HOME
+   replace: dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/TEA/Installer.silent regexp='tea-2.1' replace='TIBCO_HOME' backup=yes
+ - name: update JAVA_PATH
+   replace: dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/TEA/Installer.silent regexp='/opt/java/jdk1.7.0_71' replace='/opt/tibco/bw/tibcojre64/1.8.0' backup=yes
+ - name: change config directory 
+   replace: dest=/home/{{ ansible_ssh_user }}/Downloads/TIBCO/TEA/Installer.silent regexp='/home/user/tibco' replace='/home/{{ ansible_ssh_user }}/tibco/tibco/' backup=yes
+ - name: Silent installation 
+   shell: cd /home/{{ ansible_ssh_user }}/Downloads/TIBCO/TEA/ && ./TIBCOUniversalInstaller-lnx-x86-64.bin -silent -V responseFile=Installer.silent
+ - name: Start Tea Server
+   shell: cd /opt/tibco/tea/2.2/bin/ && ./tea &
+ - name: Start Tea Server
+   cron: name="tea" special_time=reboot job="/opt/tibco/tea/2.2/bin/tea"
+...

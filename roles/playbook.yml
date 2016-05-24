@@ -1,0 +1,9 @@
+---
+- hosts: webservers
+  remote_user: demo
+  tasks:
+   - name: Add host Dir
+     file: path=/home/{{ ansible_ssh_user }}/Downloads/TIBCO state=directory mode=0755
+  roles:
+   - MDM
+...
